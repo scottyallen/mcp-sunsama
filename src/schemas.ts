@@ -332,6 +332,25 @@ export const addSubtaskSchema = z.object({
   ),
 });
 
+// Reorder task parameters
+export const reorderTaskSchema = z.object({
+  taskId: z.string().min(1, "Task ID is required").describe(
+    "The ID of the task to reorder",
+  ),
+  position: z.number().int().min(0).describe(
+    "Target position in the task list (0 = top, 1 = second, etc.)",
+  ),
+  day: z.string().regex(
+    /^\d{4}-\d{2}-\d{2}$/,
+    "Day must be in YYYY-MM-DD format",
+  ).describe(
+    "The day to reorder within (YYYY-MM-DD format)",
+  ),
+  timezone: z.string().optional().describe(
+    "Timezone string (e.g., 'America/New_York'). If not provided, uses user's default timezone",
+  ),
+});
+
 /**
  * Response Type Schemas (for validation and documentation)
  */
@@ -449,6 +468,7 @@ export type UpdateSubtaskTitleInput = z.infer<typeof updateSubtaskTitleSchema>;
 export type CompleteSubtaskInput = z.infer<typeof completeSubtaskSchema>;
 export type UncompleteSubtaskInput = z.infer<typeof uncompleteSubtaskSchema>;
 export type AddSubtaskInput = z.infer<typeof addSubtaskSchema>;
+export type ReorderTaskInput = z.infer<typeof reorderTaskSchema>;
 
 export type User = z.infer<typeof userSchema>;
 export type Task = z.infer<typeof taskSchema>;

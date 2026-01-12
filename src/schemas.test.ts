@@ -16,6 +16,7 @@ import {
   updateTaskDueDateSchema,
   updateTaskStreamSchema,
   updateTaskTextSchema,
+  reorderTaskSchema,
   userProfileSchema,
   groupSchema,
   userSchema,
@@ -707,6 +708,219 @@ describe("Tool Parameter Schemas", () => {
           limitResponsePayload: 1,
         })
       ).toThrow();
+    });
+  });
+
+  describe("reorderTaskSchema", () => {
+    test("should accept valid reorder task input", () => {
+      const validInput = {
+        taskId: "task-123",
+        position: 0,
+        day: "2025-01-12",
+        timezone: "America/New_York",
+      };
+      expect(() => reorderTaskSchema.parse(validInput)).not.toThrow();
+    });
+
+    test("should accept minimal required input", () => {
+      const minimalInput = {
+        taskId: "task-123",
+        position: 0,
+        day: "2025-01-12",
+      };
+      expect(() => reorderTaskSchema.parse(minimalInput)).not.toThrow();
+    });
+
+    test("should accept various valid positions", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "2025-01-12",
+        })
+      ).not.toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 1,
+          day: "2025-01-12",
+        })
+      ).not.toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 100,
+          day: "2025-01-12",
+        })
+      ).not.toThrow();
+    });
+
+    test("should reject empty taskId", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "",
+          position: 0,
+          day: "2025-01-12",
+        })
+      ).toThrow();
+    });
+
+    test("should reject missing taskId", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          position: 0,
+          day: "2025-01-12",
+        })
+      ).toThrow();
+    });
+
+    test("should reject negative position", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: -1,
+          day: "2025-01-12",
+        })
+      ).toThrow();
+    });
+
+    test("should reject non-integer position", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 1.5,
+          day: "2025-01-12",
+        })
+      ).toThrow();
+    });
+
+    test("should reject missing position", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          day: "2025-01-12",
+        })
+      ).toThrow();
+    });
+
+    test("should reject invalid day formats", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "2025/01/12",
+        })
+      ).toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "01-12-2025",
+        })
+      ).toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "2025-1-12",
+        })
+      ).toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "invalid-date",
+        })
+      ).toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "",
+        })
+      ).toThrow();
+    });
+
+    test("should reject missing day", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+        })
+      ).toThrow();
+    });
+
+    test("should reject non-string taskId", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: 123,
+          position: 0,
+          day: "2025-01-12",
+        })
+      ).toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: null,
+          position: 0,
+          day: "2025-01-12",
+        })
+      ).toThrow();
+    });
+
+    test("should reject non-number position", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: "0",
+          day: "2025-01-12",
+        })
+      ).toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: null,
+          day: "2025-01-12",
+        })
+      ).toThrow();
+    });
+
+    test("should accept optional timezone", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "2025-01-12",
+          timezone: "Europe/London",
+        })
+      ).not.toThrow();
+
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "2025-01-12",
+          timezone: "Asia/Tokyo",
+        })
+      ).not.toThrow();
+    });
+
+    test("should allow undefined timezone", () => {
+      expect(() =>
+        reorderTaskSchema.parse({
+          taskId: "task-123",
+          position: 0,
+          day: "2025-01-12",
+          timezone: undefined,
+        })
+      ).not.toThrow();
     });
   });
 });

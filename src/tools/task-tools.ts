@@ -18,6 +18,8 @@ import {
   getTasksBacklogSchema,
   type GetTasksByDayInput,
   getTasksByDaySchema,
+  type ReorderTaskInput,
+  reorderTaskSchema,
   type UncompleteSubtaskInput,
   uncompleteSubtaskSchema,
   type UpdateSubtaskTitleInput,
@@ -541,6 +543,36 @@ export const addSubtaskTool = withTransportClient({
   },
 });
 
+// Task Reordering Tools
+export const reorderTaskTool = withTransportClient({
+  name: "reorder-task",
+  description: "Reorder a task within a day by moving it to a specific position (0 = top, 1 = second, etc.)",
+  parameters: reorderTaskSchema,
+  execute: async (
+    { taskId, position, day, timezone }: ReorderTaskInput,
+    context: ToolContext,
+  ) => {
+    const options: { timezone?: string } = {};
+    if (timezone) options.timezone = timezone;
+
+    const result = await context.client.reorderTask(
+      taskId,
+      position,
+      day,
+      options,
+    );
+
+    return formatJsonResponse({
+      success: true,
+      taskId,
+      position,
+      day,
+      reordered: true,
+      updatedTaskIds: result.updatedTaskIds,
+    });
+  },
+});
+
 // Export all task tools
 export const taskTools = [
   // Query tools
@@ -569,4 +601,7 @@ export const taskTools = [
   completeSubtaskTool,
   uncompleteSubtaskTool,
   addSubtaskTool,
+
+  // Reordering tools
+  reorderTaskTool,
 ];
