@@ -338,7 +338,7 @@ export const reorderTaskSchema = z.object({
     "The ID of the task to reorder",
   ),
   position: z.number().int().min(0).describe(
-    "Target position in the task list (0 = top, 1 = second, etc.)",
+    "Target position in the task list (0 = top, 1 = second, etc.). Must be less than the total number of tasks for the day.",
   ),
   day: z.string().regex(
     /^\d{4}-\d{2}-\d{2}$/,

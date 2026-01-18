@@ -546,7 +546,7 @@ export const addSubtaskTool = withTransportClient({
 // Task Reordering Tools
 export const reorderTaskTool = withTransportClient({
   name: "reorder-task",
-  description: "Reorder a task within a day by moving it to a specific position (0 = top, 1 = second, etc.)",
+  description: "Reorder a task within a day by moving it to a specific position (0 = top, 1 = second, etc.). Position must be less than the total number of tasks for the day.",
   parameters: reorderTaskSchema,
   execute: async (
     { taskId, position, day, timezone }: ReorderTaskInput,
